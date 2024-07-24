@@ -1,0 +1,47 @@
+<?php
+include 'db.php';
+session_start();
+
+
+if (!isset($_SESSION['username'])) {
+    header("Location: login.php");
+    exit();
+}
+
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $package_id = $_POST['package_id'];
+    $user_id = $_SESSION['user_id'];
+    $booking_date = date('Y-m-d');
+
+
+    $sql = "INSERT INTO bookings (user_id, package_id, booking_date) VALUES ('$user_id', '$package_id', '$booking_date')";
+    
+    if ($conn->query($sql) === TRUE) {
+        echo "Booking successful";
+    } else {
+        echo "Error: " . $sql . "<br>" . $conn->error;
+    }
+}
+?>
+
+
+<h2>Packages</h2>
+<?php
+$sql = "SELECT * FROM packages";
+$result = $conn->query($sql);
+
+
+if ($result->num_rows > 0) {
+    while($row = $result->fetch_assoc()) {
+        echo "ID: " . $row["id"]. " - Name: " . $row["name"]. " - Price: " . $row["price"]. "<br>";
+        echo "<form method='POST' action=''>
+                <input type='hidden' name='package_id' value='".$row['id']."'>
+                <button type='submit'>Book</button>
+              </form>";
+    }
+} else {
+    echo "0 results";
+}
+?>
+
